@@ -1,9 +1,13 @@
 import web
+from web import form
 import json
 import MySQLdb
+import urllib
 
 USER = 'root'
 PW = ''
+
+render = web.template.render('templates/')
 
 urls = (
 		'/random', 'random',
@@ -15,7 +19,6 @@ urls = (
 db = web.database(dbn='mysql', user=USER, pw=PW, db='panoramas')
 dbResult = db.query("SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_name='panorama'")
 if dbResult[0].total == 0:
-	print "Creating panorama table"
 	db.query("""CREATE TABLE panorama (
 		id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 		gmaps_id VARCHAR(22),
@@ -26,10 +29,21 @@ if dbResult[0].total == 0:
 		provider VARCHAR(128)
 		);""")
 
+adderForm = form.Form(form.Textbox('Json url:'))
+
+def byteify(input):
+    if isinstance(input, dict):
+        return {byteify(key):byteify(value) for key,value in input.iteritems()}
+    elif isinstance(input, list):
+        return [byteify(element) for element in input]
+    elif isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input
+
 class random:
 	def GET(self):
 		dbResult = db.query('SELECT * FROM panorama ORDER BY RAND() LIMIT 1;')
-		print dbResult
 		jsonArray = []
 		for result in dbResult:
 			jsonArray.append({'identifier': result.gmaps_id,
@@ -44,8 +58,23 @@ class random:
 
 class add:
 	def GET(self):
-		getInput = web.input()
-		db.insert('panorama', gmaps_id=getInput.id, heading=getInput.heading, lat=getInput.lat, lng=getInput.lng, title=getInput.title, provider=getInput.provider)
+		getInput = web.input(id="no data")
+		if getInput.id == "no data":
+			form = adderForm()
+			return render.addPanoForm(form)
+		else:
+			db.insert('panorama', gmaps_id=getInput.id, heading=getInput.heading, lat=getInput.lat, lng=getInput.lng, title=getInput.title, provider=getInput.provider)
+
+	def POST(self):
+		form = adderForm()
+		if not form.validates():
+			return render.addPanoForm(form)
+		else:
+			url = form['Json url:'].value
+			response = urllib.urlopen(url)
+			data = json.loads(response.read())
+			for result in data['result']:
+				db.insert('panorama', gmaps_id=result['id'], heading=result['yaw'])
 
 class remove:
 	def GET(self):

@@ -29,6 +29,8 @@ Port in use should be shown on console on start-up.
 
 /add?id=pano_id&heading=pano_heading&lat=pano_lat&lng=pano_lng&title=pano_title&provider=pano_provider
 
+/add - shows a form for input of a url to a json file to add a large number of panos. Currently expects each pano to have a 'yaw' and 'id'.
+
 /remove?id=pano_id
 
 /random - will select randomly from all panoramas added
