@@ -1,4 +1,4 @@
-13/07/2015 Web Service by Nicholas Verstegen developed for use with Peruse-a-rue Liquid Galaxy application
+15/08/2015 Web Service by Nicholas Verstegen developed for use with Peruse-a-rue Liquid Galaxy application
 
 *****************************************
 
@@ -27,16 +27,53 @@ USE
 
 Port in use should be shown on console on start-up.
 
-/add?id=pano_id&heading=pano_heading&lat=pano_lat&lng=pano_lng&title=pano_title&provider=pano_provider
+/add and checking tool
 
-/add - shows a form for input of a url to a json file to add a large number of panos. Currently expects each pano to have a 'yaw' and 'id'.
+	New panoramas can be added to the database one by one with the /add url. Pass the arguments id, heading, lat, lng, title, provider and qa_status with GET. id is compolsory, heading will be set to 0 as default and other attributes will be NULL if not set. Set qa_status argument to 'not_checked' if it needs to be looked over later otherwise set it to 'checked' if you're confident it is correct. qa_status defaults to 'not_checked'.
 
-/remove?id=pano_id
+	Set the 'check' argument to 'true' to display the checking tool. This displays a panorama view and form for adjusting/finding information before submitting.
 
-/random - will select randomly from all panoramas added
+/addbyurl
 
-/poi - lists all tables in the database
+	Serves a form for input of a url to a json file to add a large number of panos. Currently expects each pano to have a 'yaw' and 'id'. i.e. {result:[{id:"id", yaw:"yaw"}, {id:"id", yaw:"yaw"}, ......]}
+	Panos entered this was are marked as 'not_checked'.
 
-/poi?category=poi_category - json dump of the selected category
+/addpaste
 
-/poi?catergory=poi_category&id=pano_id - adds the panorama to the category
+	Not yet implemented.
+
+/edit
+	
+	Not yet implemented.
+
+/remove
+
+	Provide the an id argument via GET and panoramas with this id will be removed from the database.
+
+/random 
+
+	Will select randomly from all panoramas in the database
+
+/category
+
+	Provide a category argument via GET. All panoramas in the specified category will be returned.
+
+/removefromcategory
+
+	Provide a category and id argument via GET. The specified panorama will be removed from the specified category.
+
+/addtocategory
+
+	Provide a category and id argument via GET. The specified panorama will be added to the specified category.
+
+*****************************************
+
+TODO
+
+- Stricter data validation
+
+- Database report (number of panos, categories, unchecked panos)
+
+- Edit page, query for all unchecked panos and edit page for categories
+
+- Make add by paste and add by url more useful?

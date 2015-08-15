@@ -3,47 +3,72 @@ from web import form
 import json
 import MySQLdb
 import urllib
+import time
 
+# Username and Password for mysql database
 USER = 'root'
 PW = ''
 
+# Set location of html templates
 render = web.template.render('templates/')
 
+# Connect urls to functions
 urls = (
 		'/random', 'random',
 		'/add', 'add',
 		'/remove', 'remove',
-		'/poi', 'poi'
+		'/addtocategory', 'addToCategory',
+		'/removefromcategory', 'removeFromCategory',
+		'/category', 'category',
+		'/addbyurl', 'addByUrl',
+		'/addbypaste', 'addByPaste',
+		'/edit', 'edit'
 	)
 
+# Define forms
+checkForm = form.Form(form.Textbox("Pano id"),
+						 form.Textbox("Heading"),
+						 form.Textbox("Lat"),
+						 form.Textbox("Lng"),
+						 form.Textbox("Title"),
+						 form.Textbox("Provider"),
+						 form.Checkbox("QA Status"))
+urlAdderForm = form.Form(form.Textbox('Json url:'))
+
+# Connect to the database
 db = web.database(dbn='mysql', user=USER, pw=PW, db='panoramas')
-dbResult = db.query("SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_name='panorama'")
+
+# Check if panoramas table exists
+dbResult = db.query("SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_name='panoramas'")
 if dbResult[0].total == 0:
-	db.query("""CREATE TABLE panorama (
+	# Create panoramas table
+	db.query("""CREATE TABLE panoramas (
 		id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 		gmaps_id VARCHAR(22),
 		heading SMALLINT,
 		lat FLOAT(9, 6),
 		lng FLOAT(9, 6),
-		title VARCHAR(128),
-		provider VARCHAR(128)
+		title VARCHAR(255),
+		provider VARCHAR(255),
+		qa_status VARCHAR(11), # Either 'checked' or 'not_checked'
+		date_added DATE
 		);""")
 
-adderForm = form.Form(form.Textbox('Json url:'))
+# Check if categories table exists
+dbResult = db.query("SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_name='categories'")
+if dbResult[0].total == 0:
+	# Create categories table
+	db.query("""CREATE TABLE categories (
+		id INT NOT NULL,
+		FOREIGN KEY (id) REFERENCES panoramas(id),
+		category_name VARCHAR(255) NOT NULL, 
+		CONSTRAINT poi_id PRIMARY KEY (id, category_name)
+		);""")
 
-def byteify(input):
-    if isinstance(input, dict):
-        return {byteify(key):byteify(value) for key,value in input.iteritems()}
-    elif isinstance(input, list):
-        return [byteify(element) for element in input]
-    elif isinstance(input, unicode):
-        return input.encode('utf-8')
-    else:
-        return input
-
+# Selects a random panorama from the panoramas table
 class random:
 	def GET(self):
-		dbResult = db.query('SELECT * FROM panorama ORDER BY RAND() LIMIT 1;')
+		dbResult = db.query('SELECT * FROM panoramas ORDER BY RAND() LIMIT 1;')
 		jsonArray = []
 		for result in dbResult:
 			jsonArray.append({'identifier': result.gmaps_id,
@@ -51,83 +76,115 @@ class random:
 				'lat': result.lat,
 				'lng': result.lng,
 				'title': result.title,
-				'provider': result.provider})
+				'provider': result.provider,
+				'qa_status': result.qa_status,
+				'date_added': result.date_added})
 		jsonResult = {'result':jsonArray}
 		web.header('Content-Type', 'application/json')
 		return json.dumps(jsonResult)
 
+# Adds a panorama to the panoramas table. 
+# The check flag will determine if the check tools is used,
+# Else the panorama is sent stright to the database
 class add:
 	def GET(self):
-		getInput = web.input(id="no data")
-		if getInput.id == "no data":
-			form = adderForm()
-			return render.addPanoForm(form)
+		webInput = web.input(check="false", id="", heading=0, lat=None, lng=None, title=None, provider=None, qa_status="not_checked", date_added=time.strftime("%Y/%m/%d"))
+		if webInput.check=="true":
+			# Build the checking tool form
+			form = checkForm()
+			form.get("Title").value = webInput.title
+			form.get("Provider").value = webInput.provider
+
+			return render.checkPano(checkForm, gmaps_id=webInput.id, heading=webInput.heading)
+		
+		elif webInput.id=="":
+			web.ctx.status = '400 Bad Request'
+			return 'explicit 400'
+
 		else:
-			db.insert('panorama', gmaps_id=getInput.id, heading=getInput.heading, lat=getInput.lat, lng=getInput.lng, title=getInput.title, provider=getInput.provider)
+			db.insert('panoramas', gmaps_id=webInput.id, heading=webInput.heading, lat=webInput.lat, lng=webInput.lng, title=webInput.title, provider=webInput.provider, qa_status=webInput.qa_status, date_added=time.strftime("%Y/%m/%d"))
+
+	# Handle data sent from the check tool				
+	def POST(self):
+		form = checkForm()
+		if form.validates():
+			db.insert('panoramas', gmaps_id=form['Pano id'].value, heading=form['Heading'].value, lat=form['Lat'].value, lng=form['Lng'].value, title=form['Title'].value, provider=form['Provider'].value, qa_status="checked", date_added=time.strftime("%Y/%m/%d"))	
+		else:
+			pass
+
+# addByUrl expects a url that point to json with {result:[{id:"id", yaw:"yaw"}]}
+class addByUrl:
+	def GET(self):
+		form = urlAdderForm()
+		return render.addPanoByUrl(form)
 
 	def POST(self):
-		form = adderForm()
+		form = urlAdderForm()
 		if not form.validates():
-			return render.addPanoForm(form)
+			return render.addPanoByUrl(form)
 		else:
 			url = form['Json url:'].value
 			response = urllib.urlopen(url)
 			data = json.loads(response.read())
 			for result in data['result']:
-				db.insert('panorama', gmaps_id=result['id'], heading=result['yaw'])
+				db.insert('panoramas', gmaps_id=result['id'], heading=result['yaw'], qa_status="not_checked", date_added=time.strftime("%Y/%m/%d"))
+
+class addByPaste:
+	def GET(self):
+		pass
+
+class category:
+	def GET(self):
+		webInput = web.input()
+		dbResult = db.query("SELECT * FROM panoramas INNER JOIN categories ON panoramas.id=categories.id WHERE categories.category_name=$category", vars={'category':webInput.category})
+		jsonArray = []
+		for result in dbResult:
+			jsonArray.append({'identifier':result.gmaps_id,
+				'heading': result.heading,
+				'lat': result.lat,
+				'lng': result.lng,
+				'title': result.title,
+				'provider': result.provider,
+				'qa_status': result.qa_status,
+				'date_added': result.date_added})
+		jsonResult = {'result':jsonArray}
+		web.header('Content-Type', 'application/json')
+		return json.dumps(jsonResult)
+
+class removeFromCategory:
+	def GET(self):
+		webInput = web.input(category='no data', id='no data')
+		if webInput.category == 'no data' or webInput.id == 'no data':
+			web.ctx.status = '400 Bad Request'
+			return 'explicit 400'
+		else:
+			dbResult = db.select('panoramas', where="gmaps_id = $id", vars={'id':webInput.id})
+			panoId = dbResult[0].id # Database id
+			db.delete('categories', where="id=$id AND category_name=$category", vars={'id':panoId, 'category':webInput.category})
+
+class addToCategory:
+	def GET(self):
+		webInput = web.input(category='no data', id='no data')
+		if webInput.category == 'no data' or webInput.id == 'no data':
+			web.ctx.status = '400 Bad Request'
+			return 'explicit 400'
+		else:
+			dbResult = db.select('panoramas', where="gmaps_id = $id", vars={'id':webInput.id})
+			panoId = dbResult[0].id # Database id
+			db.insert('categories', id=panoId, category_name=webInput.category)
+
+class edit:
+	def GET(self):
+		pass
 
 class remove:
 	def GET(self):
-		getInput = web.input()
+		webInput = web.input()
 		#Find pano to delete
-		dbResult = db.query("SELECT id FROM panorama WHERE gmaps_id='"+ getInput.id +"'")
-		panoId = dbResult[0].id
-		#Get list of all tables 
-		dbResult = db.query("SELECT table_name FROM information_schema.tables WHERE table_schema='panoramas';")
-		for result in dbResult:
-			#Delete pano from categories first
-			if result.table_name != 'panorama':
-				db.delete(result.table_name, where="id='" +str(panoId)+ "'")
-				#Delete category if no rows left
-				dbResult2 = db.query("SELECT COUNT(*) AS total FROM " + result.table_name)
-				if dbResult2[0].total == 0:
-					db.query("DROP TABLES "+ result.table_name)
-		db.delete("panorama", where="id='" +str(panoId)+ "'")
-
-class poi:
-	def GET(self):
-		getInput = web.input(category='no data', id='no data')
-		if getInput.category == 'no data':
-			#List all tables
-			tables = []
-			dbResult = db.query("SELECT table_name FROM information_schema.tables WHERE table_schema='panoramas';")
-			for table in dbResult:
-				tables.append(table.table_name)
-			return tables
-		elif getInput.id == 'no data':
-			#Return panoramas in the category
-			dbResult = db.query("SELECT * FROM panorama INNER JOIN "+ getInput.category +" ON panorama.id="+ getInput.category +".id;")
-			jsonArray = []
-			for result in dbResult:
-				jsonArray.append({'identifier': result.gmaps_id,
-					'heading': result.heading,
-					'lat': result.lat,
-					'lng': result.lng,
-					'title': result.title,
-					'provider': result.provider})
-			jsonResult = {'result':jsonArray}
-			web.header('Content-Type', 'application/json')
-			return json.dumps(jsonResult)
-
-		else:
-			#Add pano to the category
-			dbResult = db.query("SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_name='"+ getInput.category +"'")
-			if dbResult[0].total == 0:
-				#Add category
-				db.query("CREATE TABLE " + getInput.category + " ( id INT NOT NULL, FOREIGN KEY (id) REFERENCES panorama(id) );")
-			dbResult = db.query("SELECT id FROM panorama WHERE gmaps_id='"+ getInput.id +"';")
-			if dbResult:
-				db.insert(getInput.category, id=dbResult[0].id)
+		dbResult = db.select('panoramas', where="gmaps_id = $id", vars={'id':webInput.id})
+		panoId = dbResult[0].id # Database id
+		db.delete('categories', where="id=$id", vars={'id':panoId})
+		db.delete('panoramas', where="id=$id", vars={'id':panoId})
 
 if __name__ == "__main__":
 	app = web.application(urls, globals())
