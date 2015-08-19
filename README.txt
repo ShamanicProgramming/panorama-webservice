@@ -31,7 +31,7 @@ Port in use should be shown on console on start-up.
 
 	New panoramas can be added to the database one by one with the /add url. Pass the arguments id, heading, lat, lng, title, provider and qa_status with GET. id is compolsory, heading will be set to 0 as default and other attributes will be NULL if not set. Set qa_status argument to 'not_checked' if it needs to be looked over later otherwise set it to 'checked' if you're confident it is correct. qa_status defaults to 'not_checked'.
 
-	Set the 'check' argument to 'true' to display the checking tool. This displays a panorama view and form for adjusting/finding information before submitting.
+	Set the 'check' argument to 'true' to display the checking tool. This displays a panorama view and form for adjusting/finding information before submitting. Entering panos with the checking tool submit button will automatically make the 'checked'.
 
 /addbyurl
 
@@ -44,7 +44,7 @@ Port in use should be shown on console on start-up.
 
 /edit
 	
-	Not yet implemented.
+	Shows a list of all panoramas or if onlyNotChecked=true then a list of all unchecked panos. The 'Edit' button on each pano will open the checking tool for that pano. Use 'Replace' or 'Remove' buttons. Replaced panos will become 'checked'.
 
 /remove
 
@@ -74,6 +74,6 @@ TODO
 
 - Database report (number of panos, categories, unchecked panos)
 
-- Edit page, query for all unchecked panos and edit page for categories
+- Edit page for categories and adding panos to categories
 
-- Make add by paste and add by url more useful?
+- Implement paste by url

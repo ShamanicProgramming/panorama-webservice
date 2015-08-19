@@ -1,0 +1,128 @@
+$def with (list, form)
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+var panorama;
+var sv;
+var panoData;
+
+function initialize() {
+	panorama = new google.maps.StreetViewPanorama(document.getElementById('pano'));
+	sv = new google.maps.StreetViewService();
+}
+
+function showEditDiv(button) {
+	panoData = [];
+	$$(button).closest("td").siblings("td").each(function(index, obj){
+		panoData.push(obj.innerHTML);
+	})
+	document.getElementById('editdiv').style.display = 'initial';
+	panorama.setPano(panoData[0]);
+	panorama.setPov({
+		heading: parseInt(panoData[1]),
+		pitch: 0
+	});
+
+	document.getElementById("Pano id").value = panorama.getPano();
+	document.getElementById("Heading").value = panorama.getPov().heading;
+	sv.getPanoramaById(panorama.getPano(), function(data, status) {
+		document.getElementById("Lat").value = data.location.latLng.lat();
+		document.getElementById("Lng").value = data.location.latLng.lng();
+		document.getElementById("Title").value = data.location.description;
+		document.getElementById("Provider").value = data.copyright;
+	});
+
+	var inputs = document.getElementsByTagName("input");
+	for (i=0; i<inputs.length; i++) {
+		inputs[i].onchange = changeHandler;
+	}
+
+	document.getElementById("resetpitch").onclick = pitchReset;
+
+	panorama.addListener('pov_changed', function() {
+		document.getElementById("Heading").value = panorama.getPov().heading;
+	});
+
+	panorama.addListener('pano_changed', function() {
+		document.getElementById("Pano id").value = panorama.getPano();
+		document.getElementById("Heading").value = panorama.getPov().heading;
+		sv.getPanoramaById(panorama.getPano(), function(data, status) {
+			document.getElementById("Lat").value = data.location.latLng.lat();
+			document.getElementById("Lng").value = data.location.latLng.lng();
+			document.getElementById("Title").value = data.location.description;
+			document.getElementById("Provider").value = data.copyright;
+		});
+	});
+}
+
+function changeHandler() {
+	panorama.setPov({
+		heading: Number(document.getElementById("Heading").value),
+		pitch: 0
+	});
+	panorama.setPano(document.getElementById("Pano id").value);
+}
+
+function pitchReset() {
+	panorama.setPov({
+		heading: panorama.getPov().heading,
+		pitch: 0
+	});
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+ 
+<style>
+
+th{
+	border:solid thin;
+}
+
+td{
+	border: solid thin;
+}
+
+</style>
+
+<div id="editdiv" name="editdiv" style="display:none">
+	<div id="pano" style="width: 100%; height: 45%;"></div>
+	<div id="panoformdiv">
+		<form name="main" method="post"> 
+		$if not form.valid: <p class="error">Try again:</p>
+		$:form.render()
+		<button type="button" id="resetpitch">Reset Pitch</button>
+		<input type="submit" name="form_action" value="Remove"/>
+		<input type="submit" name="form_action" value="Replace"/>
+		</form>
+</div>
+</div>
+
+<div id="listdiv">
+<table style="width:100%; border:solid thin">
+	<tr>
+		<th>Pano id</th>
+		<th>Heading</th>
+		<th>Lat</th>
+		<th>Lng</th>
+		<th>Title</th>
+		<th>Provider</th>
+		<th>QA Status</th>
+		<th>Date Added</th>
+		<th>Edit</th>
+	</tr>
+	$for item in list:
+		<tr>
+			<td>$item.gmaps_id</td>
+			<td>$item.heading</td>
+			<td>$item.lat</td>
+			<td>$item.lng</td>
+			<td>$item.title</td>
+			<td>$item.provider</td>
+			<td>$item.qa_status</td>
+			<td>$item.date_added</td>
+			<td><button onclick="showEditDiv(this)">Edit</td>
+		</tr>
+</table>
+</div>	

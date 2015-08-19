@@ -22,7 +22,8 @@ urls = (
 		'/category', 'category',
 		'/addbyurl', 'addByUrl',
 		'/addbypaste', 'addByPaste',
-		'/edit', 'edit'
+		'/edit', 'edit',
+		'/editpano', 'editPano'
 	)
 
 # Define forms
@@ -31,8 +32,7 @@ checkForm = form.Form(form.Textbox("Pano id"),
 						 form.Textbox("Lat"),
 						 form.Textbox("Lng"),
 						 form.Textbox("Title"),
-						 form.Textbox("Provider"),
-						 form.Checkbox("QA Status"))
+						 form.Textbox("Provider"))
 urlAdderForm = form.Form(form.Textbox('Json url:'))
 
 # Connect to the database
@@ -175,7 +175,33 @@ class addToCategory:
 
 class edit:
 	def GET(self):
-		pass
+		webInput = web.input(onlyNotChecked='false')
+		form = checkForm()
+		if webInput.onlyNotChecked == 'true':
+			dbResult = db.select('panoramas', where="qa_status = 'not_checked'")
+		else:
+			dbResult = db.select('panoramas')
+		return render.editList(dbResult, form)
+
+	def POST(self):
+		webInput = web.input(onlyNotChecked='false')
+		form = checkForm()
+		if not form.validates():
+			pass	
+		else:
+			dbResult = db.select('panoramas', where="gmaps_id = $id", vars={'id':form['Pano id'].value})
+			panoId = dbResult[0].id # Database id
+			if webInput.form_action == "Remove":
+				db.delete('categories', where="id=$id", vars={'id':panoId})
+				db.delete('panoramas', where="id=$id", vars={'id':panoId})
+			elif webInput.form_action == "Replace":
+				db.update('panoramas', where="id = $id", vars={'id':panoId}, gmaps_id=form['Pano id'].value, heading=form['Heading'].value, lat=form['Lat'].value, lng=form['Lng'].value, title=form['Title'].value, provider=form['Provider'].value, qa_status="checked")
+
+		if webInput.onlyNotChecked == 'true':
+			dbResult = db.select('panoramas', where="qa_status = 'not_checked'")
+		else:
+			dbResult = db.select('panoramas')
+		return render.editList(dbResult, form)
 
 class remove:
 	def GET(self):
