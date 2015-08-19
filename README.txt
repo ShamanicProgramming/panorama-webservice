@@ -76,4 +76,4 @@ TODO
 
 - Edit page for categories and adding panos to categories
 
-- Implement paste by url
+- Implement add by url
