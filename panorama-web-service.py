@@ -23,7 +23,8 @@ urls = (
 		'/addbyurl', 'addByUrl',
 		'/addbypaste', 'addByPaste',
 		'/edit', 'edit',
-		'/editpano', 'editPano'
+		'/editpano', 'editPano',
+		'/all', 'all'
 	)
 
 # Define forms
@@ -145,8 +146,24 @@ class category:
 				'lng': result.lng,
 				'title': result.title,
 				'provider': result.provider,
-				'qa_status': result.qa_status,
-				'date_added': result.date_added})
+				'qa_status': result.qa_status})
+		jsonResult = {'result':jsonArray}
+		web.header('Content-Type', 'application/json')
+		return json.dumps(jsonResult)
+
+class all:
+	def GET(self):
+		webInput = web.input()
+		dbResult = db.select("panoramas")
+		jsonArray = []
+		for result in dbResult:
+			jsonArray.append({'identifier':result.gmaps_id,
+				'heading': result.heading,
+				'lat': result.lat,
+				'lng': result.lng,
+				'title': result.title,
+				'provider': result.provider,
+				'qa_status': result.qa_status})
 		jsonResult = {'result':jsonArray}
 		web.header('Content-Type', 'application/json')
 		return json.dumps(jsonResult)

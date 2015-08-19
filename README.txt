@@ -1,4 +1,4 @@
-15/08/2015 Web Service by Nicholas Verstegen developed for use with Peruse-a-rue Liquid Galaxy application
+19/08/2015 Web Service by Nicholas Verstegen developed for use with Peruse-a-rue Liquid Galaxy application
 
 *****************************************
 
@@ -42,6 +42,10 @@ Port in use should be shown on console on start-up.
 
 	Not yet implemented.
 
+/all
+
+	Returns JSON for all the panoramas in the database.
+
 /edit
 	
 	Shows a list of all panoramas or if onlyNotChecked=true then a list of all unchecked panos. The 'Edit' button on each pano will open the checking tool for that pano. Use 'Replace' or 'Remove' buttons. Replaced panos will become 'checked'.
@@ -56,7 +60,7 @@ Port in use should be shown on console on start-up.
 
 /category
 
-	Provide a category argument via GET. All panoramas in the specified category will be returned.
+	Provide a category argument via GET. JSON for all panoramas in the specified category will be returned.
 
 /removefromcategory
 
@@ -65,15 +69,3 @@ Port in use should be shown on console on start-up.
 /addtocategory
 
 	Provide a category and id argument via GET. The specified panorama will be added to the specified category.
-
-*****************************************
-
-TODO
-
-- Stricter data validation
-
-- Database report (number of panos, categories, unchecked panos)
-
-- Edit page for categories and adding panos to categories
-
-- Implement add by url
