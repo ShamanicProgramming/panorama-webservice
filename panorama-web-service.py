@@ -5,9 +5,13 @@ import MySQLdb
 import urllib
 import time
 import yaml
+import os.path
 
 # Load and parse the config.yaml file
-stream = file('config.yaml', 'r')
+if os.path.isfile('config.yaml'):
+	stream = file('config.yaml', 'r')
+else:
+	stream = file('config-sample.yaml')
 config = yaml.load(stream)
 
 # Set location of html templates

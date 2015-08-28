@@ -25,7 +25,13 @@ DATABASE SETUP
 
 CREATE DATABASE panoramas;
 
+*****************************************
+
+CONFIG
+
 User, password and name for database are set in config.yaml.
+config-sample.yaml is supplied. config.yaml should take first precedence but config-sample.yaml
+will be used otherwise.
 
 *****************************************
 
