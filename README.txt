@@ -7,6 +7,8 @@ INSTALL
 Requires web.py, mysqdb and mysql-server.
 PyYAML is provided but must be installed.
 
+The following commands for setup were run on Ubuntu:
+
 $ sudo apt-get install python-setuptools
 $ sudo easy_install web.py
 
@@ -28,6 +30,10 @@ User, password and name for database are set in config.yaml.
 *****************************************
 
 USE
+
+The webservice is run with the python interpreter:
+
+$ python ./panorama-web-service.py
 
 Port in use should be shown on console on start-up.
 
