@@ -4,7 +4,8 @@
 
 INSTALL
 
-Requires web.py, mysqdb and mysql-server
+Requires web.py, mysqdb and mysql-server.
+PyYAML is provided but must be installed.
 
 $ sudo apt-get install python-setuptools
 $ sudo easy_install web.py
@@ -13,13 +14,16 @@ $ sudo apt-get install python-mysqldb
 
 $ sudo apt-get install mysql-server
 
+Move to ./panorama-webservice/PyYAML-3.11
+$ sudo python setup.py install
+
 *****************************************
 
 DATABASE SETUP
 
 CREATE DATABASE panoramas;
 
-User and password are set at the top of poi-web-service.py with USER and PW constants.
+User, password and name for database are set in config.yaml.
 
 *****************************************
 

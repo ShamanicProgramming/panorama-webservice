@@ -4,10 +4,11 @@ import json
 import MySQLdb
 import urllib
 import time
+import yaml
 
-# Username and Password for mysql database
-USER = 'root'
-PW = ''
+# Load and parse the config.yaml file
+stream = file('config.yaml', 'r')
+config = yaml.load(stream)
 
 # Set location of html templates
 render = web.template.render('templates/')
@@ -33,11 +34,11 @@ checkForm = form.Form(form.Textbox("Pano id"),
 						 form.Textbox("Lat"),
 						 form.Textbox("Lng"),
 						 form.Textbox("Title"),
-						 form.Textbox("Provider"))
+						 form.Textbox("Owner"))
 urlAdderForm = form.Form(form.Textbox('Json url:'))
 
 # Connect to the database
-db = web.database(dbn='mysql', user=USER, pw=PW, db='panoramas')
+db = web.database(dbn='mysql', user=config['user'], pw=config['password'], db=config['database'])
 
 # Check if panoramas table exists
 dbResult = db.query("SELECT COUNT(*) AS total FROM information_schema.tables WHERE table_name='panoramas'")
@@ -50,7 +51,8 @@ if dbResult[0].total == 0:
 		lat FLOAT(9, 6),
 		lng FLOAT(9, 6),
 		title VARCHAR(255),
-		provider VARCHAR(255),
+		Owner VARCHAR(255),
+		Provider VARCHAR(255),
 		qa_status VARCHAR(11), # Either 'checked' or 'not_checked'
 		date_added DATE
 		);""")
@@ -77,7 +79,7 @@ class random:
 				'lat': result.lat,
 				'lng': result.lng,
 				'title': result.title,
-				'provider': result.provider,
+				'owner': result.owner,
 				'qa_status': result.qa_status,
 				'date_added': result.date_added})
 		jsonResult = {'result':jsonArray}
@@ -89,12 +91,12 @@ class random:
 # Else the panorama is sent stright to the database
 class add:
 	def GET(self):
-		webInput = web.input(check="false", id="", heading=0, lat=None, lng=None, title=None, provider=None, qa_status="not_checked", date_added=time.strftime("%Y/%m/%d"))
+		webInput = web.input(check="false", id="", heading=0, lat=None, lng=None, title=None, owner=None, qa_status="not_checked", date_added=time.strftime("%Y/%m/%d"))
 		if webInput.check=="true":
 			# Build the checking tool form
 			form = checkForm()
 			form.get("Title").value = webInput.title
-			form.get("Provider").value = webInput.provider
+			form.get("Owner").value = webInput.owner
 
 			return render.checkPano(checkForm, gmaps_id=webInput.id, heading=webInput.heading)
 		
@@ -103,13 +105,13 @@ class add:
 			return 'explicit 400'
 
 		else:
-			db.insert('panoramas', gmaps_id=webInput.id, heading=webInput.heading, lat=webInput.lat, lng=webInput.lng, title=webInput.title, provider=webInput.provider, qa_status=webInput.qa_status, date_added=time.strftime("%Y/%m/%d"))
+			db.insert('panoramas', gmaps_id=webInput.id, heading=webInput.heading, lat=webInput.lat, lng=webInput.lng, title=webInput.title, owner=webInput.owner, qa_status=webInput.qa_status, date_added=time.strftime("%Y/%m/%d"))
 
 	# Handle data sent from the check tool				
 	def POST(self):
 		form = checkForm()
 		if form.validates():
-			db.insert('panoramas', gmaps_id=form['Pano id'].value, heading=form['Heading'].value, lat=form['Lat'].value, lng=form['Lng'].value, title=form['Title'].value, provider=form['Provider'].value, qa_status="checked", date_added=time.strftime("%Y/%m/%d"))	
+			db.insert('panoramas', gmaps_id=form['Pano id'].value, heading=form['Heading'].value, lat=form['Lat'].value, lng=form['Lng'].value, title=form['Title'].value, owner=form['Owner'].value, qa_status="checked", date_added=time.strftime("%Y/%m/%d"))	
 		else:
 			pass
 
@@ -145,7 +147,7 @@ class category:
 				'lat': result.lat,
 				'lng': result.lng,
 				'title': result.title,
-				'provider': result.provider,
+				'owner': result.owner,
 				'qa_status': result.qa_status})
 		jsonResult = {'result':jsonArray}
 		web.header('Content-Type', 'application/json')
@@ -162,7 +164,7 @@ class all:
 				'lat': result.lat,
 				'lng': result.lng,
 				'title': result.title,
-				'provider': result.provider,
+				'owner': result.owner,
 				'qa_status': result.qa_status})
 		jsonResult = {'result':jsonArray}
 		web.header('Content-Type', 'application/json')
@@ -212,7 +214,7 @@ class edit:
 				db.delete('categories', where="id=$id", vars={'id':panoId})
 				db.delete('panoramas', where="id=$id", vars={'id':panoId})
 			elif webInput.form_action == "Replace":
-				db.update('panoramas', where="id = $id", vars={'id':panoId}, gmaps_id=form['Pano id'].value, heading=form['Heading'].value, lat=form['Lat'].value, lng=form['Lng'].value, title=form['Title'].value, provider=form['Provider'].value, qa_status="checked")
+				db.update('panoramas', where="id = $id", vars={'id':panoId}, gmaps_id=form['Pano id'].value, heading=form['Heading'].value, lat=form['Lat'].value, lng=form['Lng'].value, title=form['Title'].value, owner=form['Owner'].value, qa_status="checked")
 
 		if webInput.onlyNotChecked == 'true':
 			dbResult = db.select('panoramas', where="qa_status = 'not_checked'")

@@ -19,7 +19,7 @@ function initialize() {
 		document.getElementById("Lat").value = data.location.latLng.lat();
 		document.getElementById("Lng").value = data.location.latLng.lng();
 		document.getElementById("Title").value = data.location.description;
-		document.getElementById("Provider").value = data.copyright;
+		document.getElementById("Owner").value = data.copyright;
 	});
 	var inputs = document.getElementsByTagName("input");
 	for (i=0; i<inputs.length; i++) {
@@ -38,7 +38,7 @@ function initialize() {
 			document.getElementById("Lat").value = data.location.latLng.lat();
 			document.getElementById("Lng").value = data.location.latLng.lng();
 			document.getElementById("Title").value = data.location.description;
-			document.getElementById("Provider").value = data.copyright;
+			document.getElementById("Owner").value = data.copyright;
 		});
 	});
 }

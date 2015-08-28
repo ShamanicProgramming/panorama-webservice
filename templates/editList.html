@@ -30,7 +30,7 @@ function showEditDiv(button) {
 		document.getElementById("Lat").value = data.location.latLng.lat();
 		document.getElementById("Lng").value = data.location.latLng.lng();
 		document.getElementById("Title").value = data.location.description;
-		document.getElementById("Provider").value = data.copyright;
+		document.getElementById("Owner").value = data.copyright;
 	});
 
 	var inputs = document.getElementsByTagName("input");
@@ -51,7 +51,7 @@ function showEditDiv(button) {
 			document.getElementById("Lat").value = data.location.latLng.lat();
 			document.getElementById("Lng").value = data.location.latLng.lng();
 			document.getElementById("Title").value = data.location.description;
-			document.getElementById("Provider").value = data.copyright;
+			document.getElementById("Owner").value = data.copyright;
 		});
 	});
 }
@@ -107,7 +107,7 @@ td{
 		<th>Lat</th>
 		<th>Lng</th>
 		<th>Title</th>
-		<th>Provider</th>
+		<th>Owner</th>
 		<th>QA Status</th>
 		<th>Date Added</th>
 		<th>Edit</th>
@@ -119,7 +119,7 @@ td{
 			<td>$item.lat</td>
 			<td>$item.lng</td>
 			<td>$item.title</td>
-			<td>$item.provider</td>
+			<td>$item.owner</td>
 			<td>$item.qa_status</td>
 			<td>$item.date_added</td>
 			<td><button onclick="showEditDiv(this)">Edit</td>
