@@ -80,8 +80,7 @@ class random:
 				'lng': result.lng,
 				'title': result.title,
 				'owner': result.owner,
-				'qa_status': result.qa_status,
-				'date_added': result.date_added})
+				'qa_status': result.qa_status})
 		jsonResult = {'result':jsonArray}
 		web.header('Content-Type', 'application/json')
 		return json.dumps(jsonResult)
