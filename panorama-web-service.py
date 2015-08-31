@@ -1,4 +1,5 @@
 import web
+import sys
 from web import form
 import json
 import MySQLdb
@@ -11,7 +12,8 @@ import os.path
 if os.path.isfile('config.yaml'):
 	stream = file('config.yaml', 'r')
 else:
-	stream = file('config-sample.yaml')
+	web.debug("config.yaml is missing. Please provide a config file in the panorama-webservice directory. config-sample.yaml is supplied as an example.")
+	raise ConfigMissing
 config = yaml.load(stream)
 
 # Set location of html templates

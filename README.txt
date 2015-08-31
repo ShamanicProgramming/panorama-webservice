@@ -30,8 +30,8 @@ CREATE DATABASE panoramas;
 CONFIG
 
 User, password and name for database are set in config.yaml.
-config-sample.yaml is supplied. config.yaml should take first precedence but config-sample.yaml
-will be used otherwise.
+Web service will crash without a config.yaml file present in the panoramas-webservice dir.
+config-sample.yaml is supplied as an example.
 
 *****************************************
 
