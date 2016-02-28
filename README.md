@@ -1,45 +1,39 @@
+Panorama Web Service
+============
 19/08/2015 Web Service by Nicholas Verstegen developed for use with Peruse-a-rue Liquid Galaxy application
 
-*****************************************
-
-INSTALL
+### INSTALL
 
 Requires web.py, mysqdb and mysql-server.
 PyYAML is provided but must be installed.
 
 The following commands for setup were run on Ubuntu:
 
-$ sudo apt-get install python-setuptools
-$ sudo easy_install web.py
+	$ sudo apt-get install python-setuptools
+	$ sudo easy_install web.py
 
-$ sudo apt-get install python-mysqldb
+	$ sudo apt-get install python-mysqldb
 
-$ sudo apt-get install mysql-server
+	$ sudo apt-get install mysql-server
 
-Move to ./panorama-webservice/PyYAML-3.11
-$ sudo python setup.py install
+Move to ./panorama-webservice/PyYAML-3.11 then
+	$ sudo python setup.py install
 
-*****************************************
+### DATABASE SETUP
 
-DATABASE SETUP
+	$ CREATE DATABASE panoramas;
 
-CREATE DATABASE panoramas;
-
-*****************************************
-
-CONFIG
+### CONFIG
 
 User, password and name for database are set in config.yaml.
 Web service will crash without a config.yaml file present in the panoramas-webservice dir.
 config-sample.yaml is supplied as an example.
 
-*****************************************
-
-USE
+### USE
 
 The webservice is run with the python interpreter:
 
-$ python ./panorama-web-service.py
+	$ python ./panorama-web-service.py
 
 Port in use should be shown on console on start-up.
 
