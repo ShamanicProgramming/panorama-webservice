@@ -37,45 +37,45 @@ The webservice is run with the python interpreter:
 
 Port in use should be shown on console on start-up.
 
-/add and checking tool
+#### /add and checking tool
 
-	New panoramas can be added to the database one by one with the /add url. Pass the arguments id, heading, lat, lng, title, provider and qa_status with GET. id is compolsory, heading will be set to 0 as default and other attributes will be NULL if not set. Set qa_status argument to 'not_checked' if it needs to be looked over later otherwise set it to 'checked' if you're confident it is correct. qa_status defaults to 'not_checked'.
+New panoramas can be added to the database one by one with the /add url. Pass the arguments id, heading, lat, lng, title, provider and qa_status with GET. id is compolsory, heading will be set to 0 as default and other attributes will be NULL if not set. Set qa_status argument to 'not_checked' if it needs to be looked over later otherwise set it to 'checked' if you're confident it is correct. qa_status defaults to 'not_checked'.
 
-	Set the 'check' argument to 'true' to display the checking tool. This displays a panorama view and form for adjusting/finding information before submitting. Entering panos with the checking tool submit button will automatically make the 'checked'.
+Set the 'check' argument to 'true' to display the checking tool. This displays a panorama view and form for adjusting/finding information before submitting. Entering panos with the checking tool submit button will automatically make the 'checked'.
 
-/addbyurl
+#### /addbyurl
 
-	Serves a form for input of a url to a json file to add a large number of panos. Currently expects each pano to have a 'yaw' and 'id'. i.e. {result:[{id:"id", yaw:"yaw"}, {id:"id", yaw:"yaw"}, ......]}
+Serves a form for input of a url to a json file to add a large number of panos. Currently expects each pano to have a 'yaw' and 'id'. i.e. {result:[{id:"id", yaw:"yaw"}, {id:"id", yaw:"yaw"}, ......]}
 	Panos entered this was are marked as 'not_checked'.
 
-/addpaste
+#### /addpaste
 
-	Not yet implemented.
+Not yet implemented.
 
-/all
+#### /all
 
-	Returns JSON for all the panoramas in the database.
+Returns JSON for all the panoramas in the database.
 
-/edit
+#### /edit
 	
-	Shows a list of all panoramas or if onlyNotChecked=true then a list of all unchecked panos. The 'Edit' button on each pano will open the checking tool for that pano. Use 'Replace' or 'Remove' buttons. Replaced panos will become 'checked'.
+Shows a list of all panoramas or if onlyNotChecked=true then a list of all unchecked panos. The 'Edit' button on each pano will open the checking tool for that pano. Use 'Replace' or 'Remove' buttons. Replaced panos will become 'checked'.
 
-/remove
+#### /remove
 
-	Provide the an id argument via GET and panoramas with this id will be removed from the database.
+Provide the an id argument via GET and panoramas with this id will be removed from the database.
 
-/random 
+#### /random 
 
-	Will select randomly from all panoramas in the database
+Will select randomly from all panoramas in the database
 
-/category
+#### /category
 
-	Provide a category argument via GET. JSON for all panoramas in the specified category will be returned.
+Provide a category argument via GET. JSON for all panoramas in the specified category will be returned.
 
-/removefromcategory
+#### /removefromcategory
 
-	Provide a category and id argument via GET. The specified panorama will be removed from the specified category.
+Provide a category and id argument via GET. The specified panorama will be removed from the specified category.
 
-/addtocategory
+#### /addtocategory
 
-	Provide a category and id argument via GET. The specified panorama will be added to the specified category.
+Provide a category and id argument via GET. The specified panorama will be added to the specified category.
