@@ -57,8 +57,8 @@ if dbResult[0].total == 0:
 		lat FLOAT(9, 6),
 		lng FLOAT(9, 6),
 		title VARCHAR(255),
-		Owner VARCHAR(255),
-		Provider VARCHAR(255),
+		owner VARCHAR(255),
+		provider VARCHAR(255),
 		qa_status VARCHAR(11), # Either 'checked' or 'not_checked'
 		date_added DATE
 		);""")
