@@ -21,7 +21,7 @@ Move to ./panorama-webservice/PyYAML-3.11 then
 
 ### DATABASE SETUP
 
-	$ CREATE DATABASE panoramas;
+	CREATE DATABASE panoramas;
 
 ### CONFIG
 
@@ -41,7 +41,17 @@ Port in use should be shown on console on start-up.
 
 New panoramas can be added to the database one by one with the /add url. Pass the arguments id, heading, lat, lng, title, provider and qa_status with GET. id is compolsory, heading will be set to 0 as default and other attributes will be NULL if not set. Set qa_status argument to 'not_checked' if it needs to be looked over later otherwise set it to 'checked' if you're confident it is correct. qa_status defaults to 'not_checked'.
 
-Set the 'check' argument to 'true' to display the checking tool. This displays a panorama view and form for adjusting/finding information before submitting. Entering panos with the checking tool submit button will automatically make the 'checked'.
+Set the 'check' argument to 'true' to display the checking tool in a browser. This displays a panorama view and form for adjusting/finding information before submitting. Entering panos with the checking tool submit button will automatically make the 'checked'.
+
+Examples:
+
+	http://0.0.0.0:8080/add?id=pp8B6JRFJ-UAAAQp6VVXhQ&heading=272.18463
+
+Adds a panorama with an id of pp8B6JRFJ-UAAAQp6VVXhQ and a heading of 272.18463 to the database.
+
+	http://0.0.0.0:8080/add?id=M4gux_w2UpUAAAQp2XD8Qw&check=true
+
+Panorama of id M4gux_w2UpUAAAQp2XD8Qw will be brought up in the checking tool ui. It can be added after adjustments are made in the form.
 
 #### /addbyurl
 
@@ -56,6 +66,10 @@ Not yet implemented.
 
 Returns JSON for all the panoramas in the database.
 
+Examle output:
+
+	{"result": [{"title": null, "owner": null, "qa_status": "not_checked", "lat": null, "lng": null, "identifier": "pp8B6JRFJ-UAAAQp6VVXhQ", "heading": 272}, {"title": "Marios Lefteriotis", "owner": "\u00a9 Marios Lefteriotis", "qa_status": "checked", "lat": 37.971905, "lng": 23.726, "identifier": "M4gux_w2UpUAAAQp2XD8Qw", "heading": 0}]}
+
 #### /edit
 	
 Shows a list of all panoramas or if onlyNotChecked=true then a list of all unchecked panos. The 'Edit' button on each pano will open the checking tool for that pano. Use 'Replace' or 'Remove' buttons. Replaced panos will become 'checked'.
@@ -63,6 +77,12 @@ Shows a list of all panoramas or if onlyNotChecked=true then a list of all unche
 #### /remove
 
 Provide the an id argument via GET and panoramas with this id will be removed from the database.
+
+Example:
+
+	http://0.0.0.0:8080/remove?id=pp8B6JRFJ-UAAAQp6VVXhQ
+
+This will remove the panorama associated with the id pp8B6JRFJ-UAAAQp6VVXhQ from the database.
 
 #### /random 
 
