@@ -58,10 +58,6 @@ Panorama of id M4gux_w2UpUAAAQp2XD8Qw will be brought up in the checking tool ui
 Serves a form for input of a url to a json file to add a large number of panos. Currently expects each pano to have a 'yaw' and 'id'. i.e. {result:[{id:"id", yaw:"yaw"}, {id:"id", yaw:"yaw"}, ......]}
 	Panos entered this was are marked as 'not_checked'.
 
-#### /addpaste
-
-Not yet implemented.
-
 #### /all
 
 Returns JSON for all the panoramas in the database.

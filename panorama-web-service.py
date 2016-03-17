@@ -28,7 +28,6 @@ urls = (
 		'/removefromcategory', 'removeFromCategory',
 		'/category', 'category',
 		'/addbyurl', 'addByUrl',
-		'/addbypaste', 'addByPaste',
 		'/edit', 'edit',
 		'/editpano', 'editPano',
 		'/all', 'all'
@@ -136,10 +135,6 @@ class addByUrl:
 			data = json.loads(response.read())
 			for result in data['result']:
 				db.insert('panoramas', gmaps_id=result['id'], heading=result['yaw'], qa_status="not_checked", date_added=time.strftime("%Y/%m/%d"))
-
-class addByPaste:
-	def GET(self):
-		pass
 
 class category:
 	def GET(self):
