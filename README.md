@@ -39,9 +39,11 @@ Port in use should be shown on console on start-up.
 
 #### /add and checking tool
 
-New panoramas can be added to the database one by one with the /add url. Pass the arguments id, heading, lat, lng, title, provider and qa_status with GET. id is compolsory, heading will be set to 0 as default and other attributes will be NULL if not set. Set qa_status argument to 'not_checked' if it needs to be looked over later otherwise set it to 'checked' if you're confident it is correct. qa_status defaults to 'not_checked'.
+New panoramas can be added to the database one by one with the /add url. Pass the arguments id, heading, lat, lng, title, provider and qa_status with GET. Heading will be set to 0 by default and other attributes will be NULL if not set. Set qa_status argument to 'not_checked' if it needs to be looked over later. Otherwise set it to 'checked' if you're confident it is correct. qa_status defaults to 'not_checked'.
 
-Set the 'check' argument to 'true' to display the checking tool in a browser. This displays a panorama view and form for adjusting/finding information before submitting. Entering panos with the checking tool submit button will automatically make the 'checked'.
+Set the 'check' argument to 'true' to display the checking tool in a browser. This displays a panorama view and form for adjusting/finding information before submitting. Entering panos with the checking tool submit button will automatically make it 'checked'.
+
+Leaving the id blank will also return the checking tool.
 
 Examples:
 

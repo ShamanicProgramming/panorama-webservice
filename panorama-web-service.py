@@ -96,7 +96,7 @@ class random:
 class add:
 	def GET(self):
 		webInput = web.input(check="false", id="", heading=0, lat=None, lng=None, title=None, owner=None, qa_status="not_checked", date_added=time.strftime("%Y/%m/%d"))
-		if webInput.check=="true":
+		if webInput.check=="true" or webInput.id=="":
 			# Build the checking tool form
 			form = checkForm()
 			form.get("Title").value = webInput.title
